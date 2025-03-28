@@ -157,8 +157,9 @@ sns.countplot(data=data, x="q4", order=["0", "1–2", "3–4", "5+"], ax=ax2)
 ax2.set_title("Pornokonsum pro Woche")
 st.pyplot(fig2)
 
-fig3, ax3 = plt.subplots()
+fig3, ax3 = plt.subplots(figsize=(10, 5))
 sns.boxplot(data=data, x="Geschlecht", y="q5", ax=ax3)
+ax3.tick_params(axis='x', labelrotation=15)
 ax3.set_title("Wie normal ist es, über Pornokonsum zu sprechen (q5)?")
 st.pyplot(fig3)
 
@@ -179,3 +180,4 @@ if dtm.shape[0] >= 2 and dtm.shape[1] >= 2:
     lda.fit(dtm)
     for idx, topic in enumerate(lda.components_):
         st.write(f"**Thema {idx+1}:**", ", ".join([vectorizer.get_feature_names_out()[i] for i in topic.argsort()[-5:][::-1]]))
+
