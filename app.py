@@ -41,6 +41,15 @@ for i in range(29):
     })
 
 data = pd.DataFrame(sim_data)
+st.write("### 🧾 Einzelne Antworten")
+for i, row in data.iterrows():
+    st.markdown(f"**Person {i+1}**")
+    st.markdown(f"• Geschlecht: {row['Geschlecht']} | LGBTQ+: {row['LGBTQ+']} | q4: {row['q4']}")
+    st.markdown(f"• q1: _{row['q1']}_")
+    st.markdown(f"• q2: _{row['q2']}_")
+    st.markdown(f"• q3: _{row['q3']}_")
+    st.markdown("---")
+
 st.dataframe(data)
 
 st.subheader("🔎 Grafische Auswertung")
