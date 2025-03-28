@@ -27,17 +27,17 @@ q2 = ["kommt drauf an mit wem", "manchmal peinlich, man will nich verurteilt wer
 q3 = ["meine eltern sind streng", "in unserer Kultur redet man net darüber", "schule macht kein platz für sowas", "freunde lachen vllt drüber", "einfach scham"]
 
 sim_data = []
-for _ in range(29):
+for i in range(29):
     sim_data.append({
-        "Geschlecht": random.choices(geschlechter, weights=[10, 12, 5, 3])[0],
-        "LGBTQ+": random.choices(lgbtq, weights=[5, 20, 5])[0],
-        "q1": random.choice(q1),
-        "q2": random.choice(q2),
-        "q3": random.choice(q3),
-        "q4": random.choices(pornokonsum, weights=[5, 12, 8, 5])[0],
-        "q5": random.randint(1, 5),
-        "q6": random.randint(1, 5),
-        "q7": random.randint(1, 5),
+        "Geschlecht": geschlechter[i % len(geschlechter)],
+        "LGBTQ+": lgbtq[i % len(lgbtq)],
+        "q1": f"Antwort q1 von Person {i+1}",
+        "q2": f"Antwort q2 von Person {i+1}",
+        "q3": f"Antwort q3 von Person {i+1}",
+        "q4": pornokonsum[i % len(pornokonsum)],
+        "q5": (i % 5) + 1,
+        "q6": ((i+2) % 5) + 1,
+        "q7": ((i+3) % 5) + 1,
     })
 
 data = pd.DataFrame(sim_data)
