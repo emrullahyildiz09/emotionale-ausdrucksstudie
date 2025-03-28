@@ -56,7 +56,7 @@ if st.button("Antworten speichern"):
 st.markdown("---")
 with st.expander("📊 Antworten anzeigen (Admin)"):
     try:
-        data = pd.read_csv("antworten.csv")
+        data = pd.read_csv("antworten.csv", on_bad_lines='skip')
         st.dataframe(data)
     except FileNotFoundError:
         st.warning("Noch keine Antworten gespeichert oder Datei nicht gefunden.")
