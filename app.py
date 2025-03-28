@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
 import random
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -16,96 +15,64 @@ Diese Studie untersucht, wie **Geschlecht** und **Diversität** die Offenheit vo
 Die Antworten sind anonym und dienen ausschließlich wissenschaftlichen Zwecken.
 """)
 
-# Auswahl des Modus
-modus = st.radio("Bitte wähle den Fragetyp:", ["Qualitativ", "Quantitativ", "Kombiniert"])
-
-antworten = {}
-
-# Geschlecht und LGBTQ+-Zugehörigkeit
-antworten["Geschlecht"] = st.selectbox("Was ist dein Geschlecht?", ["männlich", "weiblich", "divers (z. B. nicht-binär)", "möchte ich nicht angeben"])
-antworten["LGBTQ+"] = st.radio("Identifizierst du dich als Teil der LGBTQ+ Community?", ["ja", "nein", "lieber nicht sagen"])
-
-# Fragen je nach Modus
+# Nur simulierte Daten erzeugen
 st.markdown("---")
+st.subheader("📊 Antworten anzeigen (nur Simulation)")
 
-if modus == "Qualitativ":
-    antworten["q1"] = st.text_area("Was denkst du über den Pornokonsum unter Jugendlichen?")
-    antworten["q2"] = st.text_area("Fällt es dir leicht oder schwer, über eigene Erfahrungen zu sprechen? Warum?")
-    antworten["q3"] = st.text_area("Gibt es gesellschaftliche oder familiäre Gründe, warum du dich zu diesem Thema nicht äußerst?")
+geschlechter = ["männlich", "weiblich", "divers (z. B. nicht-binär)", "möchte ich nicht angeben"]
+lgbtq = ["ja", "nein", "lieber nicht sagen"]
+pornokonsum = ["0", "1–2", "3–4", "5+"]
+q1 = ["ka eig is das privat", "alle guggn halt... normal iwie", "nich jedr redet darüber aber viele tun es", "kp ich denk viele fühl sich ertappt", "is halt tabu, aba alle wissn es"]
+q2 = ["kommt drauf an mit wem", "manchmal peinlich, man will nich verurteilt werden", "joa geht schon, aber nicht mit jedem", "bisschen unangenehm vllt", "nich leicht drüber zu reden"]
+q3 = ["meine eltern sind streng", "in unserer Kultur redet man net darüber", "schule macht kein platz für sowas", "freunde lachen vllt drüber", "einfach scham"]
 
-elif modus == "Quantitativ":
-    antworten["q4"] = st.selectbox("Wie oft konsumierst du pornografische Inhalte pro Woche?", ["0", "1–2", "3–4", "5+"])
-    antworten["q5"] = st.slider("Ich finde es normal, über Pornokonsum zu sprechen.", 1, 5, 3)
-    antworten["q6"] = st.slider("Ich fühle mich wohl, wenn ich über mein eigenes Verhalten spreche.", 1, 5, 3)
-    antworten["q7"] = st.slider("Ich fühle gesellschaftlichen Druck, mich dazu nicht zu äußern.", 1, 5, 3)
+sim_data = []
+for _ in range(29):
+    sim_data.append({
+        "Geschlecht": random.choices(geschlechter, weights=[10, 12, 5, 3])[0],
+        "LGBTQ+": random.choices(lgbtq, weights=[5, 20, 5])[0],
+        "q1": random.choice(q1),
+        "q2": random.choice(q2),
+        "q3": random.choice(q3),
+        "q4": random.choices(pornokonsum, weights=[5, 12, 8, 5])[0],
+        "q5": random.randint(1, 5),
+        "q6": random.randint(1, 5),
+        "q7": random.randint(1, 5),
+    })
 
-elif modus == "Kombiniert":
-    antworten["q4"] = st.selectbox("Wie oft konsumierst du pornografische Inhalte pro Woche?", ["0", "1–2", "3–4", "5+"])
-    antworten["q5"] = st.slider("Ich finde es normal, über Pornokonsum zu sprechen.", 1, 5, 3)
-    antworten["q5_erklärung"] = st.text_input("Möchtest du kurz erklären, warum?")
-    antworten["q6"] = st.slider("Ich fühle mich wohl, wenn ich über mein eigenes Verhalten spreche.", 1, 5, 3)
-    antworten["q6_erklärung"] = st.text_input("Was beeinflusst dieses Gefühl?")
-    antworten["q7"] = st.slider("Ich fühle gesellschaftlichen Druck, mich dazu nicht zu äußern.", 1, 5, 3)
-    antworten["q7_erklärung"] = st.text_input("Hast du konkrete Beispiele dafür?")
+data = pd.DataFrame(sim_data)
+st.dataframe(data)
 
-# Absenden
-st.markdown("---")
-if st.button("Antworten speichern"):
-    df = pd.DataFrame([antworten])
-    if os.path.exists("antworten.csv"):
-        df.to_csv("antworten.csv", mode='a', header=False, index=False)
-    else:
-        df.to_csv("antworten.csv", index=False)
-    st.success("Deine Antworten wurden gespeichert. Vielen Dank für deine Teilnahme!")
+st.subheader("🔎 Grafische Auswertung")
+fig1, ax1 = plt.subplots()
+sns.countplot(data=data, x="Geschlecht", order=data["Geschlecht"].value_counts().index, ax=ax1)
+ax1.set_title("Verteilung nach Geschlecht")
+st.pyplot(fig1)
 
-# Bereich für Admin / Forscher: Daten anzeigen und analysieren
-st.markdown("---")
-with st.expander("📊 Antworten anzeigen (Admin)"):
-    try:
-        if os.path.exists("antworten.csv"):
-            data = pd.read_csv("antworten.csv", on_bad_lines='skip')
-        else:
-            data = pd.DataFrame()
+fig2, ax2 = plt.subplots()
+sns.countplot(data=data, x="q4", order=["0", "1–2", "3–4", "5+"], ax=ax2)
+ax2.set_title("Pornokonsum pro Woche")
+st.pyplot(fig2)
 
-        st.dataframe(data)
+fig3, ax3 = plt.subplots()
+sns.boxplot(data=data, x="Geschlecht", y="q5", ax=ax3)
+ax3.set_title("Wie normal ist es, über Pornokonsum zu sprechen (q5)?")
+st.pyplot(fig3)
 
-        st.subheader("🔎 Grafische Auswertung")
-        if not data.empty:
-            if "Geschlecht" in data.columns:
-                fig1, ax1 = plt.subplots()
-                sns.countplot(data=data, x="Geschlecht", order=data["Geschlecht"].value_counts().index, ax=ax1)
-                ax1.set_title("Verteilung nach Geschlecht")
-                st.pyplot(fig1)
+# Sentimentanalyse
+st.subheader("🧠 Emotionale Tendenz (Sentiment-Analyse)")
+textfelder = ["q1", "q2", "q3"]
+textauszüge = data[textfelder].fillna("").apply(lambda x: " ".join(x), axis=1)
+sentiment_scores = textauszüge.apply(lambda x: TextBlob(x).sentiment.polarity)
+st.write("Durchschnittliches Sentiment:", round(sentiment_scores.mean(), 2))
+st.bar_chart(sentiment_scores)
 
-            if "q4" in data.columns:
-                fig2, ax2 = plt.subplots()
-                sns.countplot(data=data, x="q4", order=["0", "1–2", "3–4", "5+"], ax=ax2)
-                ax2.set_title("Pornokonsum pro Woche")
-                st.pyplot(fig2)
-
-            if "q5" in data.columns and "Geschlecht" in data.columns:
-                fig3, ax3 = plt.subplots()
-                sns.boxplot(data=data, x="Geschlecht", y="q5", ax=ax3)
-                ax3.set_title("Wie normal ist es, über Pornokonsum zu sprechen (q5)?")
-                st.pyplot(fig3)
-
-        # Sentimentanalyse
-        st.subheader("🧠 Emotionale Tendenz (Sentiment-Analyse)")
-        textfelder = [col for col in ["q1", "q2", "q3", "q5_erklärung", "q6_erklärung", "q7_erklärung"] if col in data.columns]
-        textauszüge = data[textfelder].fillna("").apply(lambda x: " ".join(x), axis=1)
-        sentiment_scores = textauszüge.apply(lambda x: TextBlob(x).sentiment.polarity)
-        st.write("Durchschnittliches Sentiment:", round(sentiment_scores.mean(), 2))
-        st.bar_chart(sentiment_scores)
-
-        # Themenanalyse (LDA)
-        st.subheader("📚 Thematische Gruppierung (LDA)")
-        vectorizer = CountVectorizer(stop_words='english', max_df=0.95, min_df=1)
-        dtm = vectorizer.fit_transform(textauszüge[textauszüge.str.strip() != ""])
-        if dtm.shape[0] >= 2 and dtm.shape[1] >= 2:
-            lda = LatentDirichletAllocation(n_components=3, random_state=0)
-            lda.fit(dtm)
-            for idx, topic in enumerate(lda.components_):
-                st.write(f"**Thema {idx+1}:**", ", ".join([vectorizer.get_feature_names_out()[i] for i in topic.argsort()[-5:][::-1]]))
-
-    except Exception as e:
-        st.error(f"Fehler beim Laden der Daten: {e}")
+# Themenanalyse (LDA)
+st.subheader("📚 Thematische Gruppierung (LDA)")
+vectorizer = CountVectorizer(stop_words='english', max_df=0.95, min_df=1)
+dtm = vectorizer.fit_transform(textauszüge[textauszüge.str.strip() != ""])
+if dtm.shape[0] >= 2 and dtm.shape[1] >= 2:
+    lda = LatentDirichletAllocation(n_components=3, random_state=0)
+    lda.fit(dtm)
+    for idx, topic in enumerate(lda.components_):
+        st.write(f"**Thema {idx+1}:**", ", ".join([vectorizer.get_feature_names_out()[i] for i in topic.argsort()[-5:][::-1]]))
