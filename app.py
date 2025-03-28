@@ -91,7 +91,7 @@ with st.expander("📊 Antworten anzeigen (Admin)"):
 
         # Sentimentanalyse
         st.subheader("🧠 Emotionale Tendenz (Sentiment-Analyse)")
-        textfelder = ["q1", "q2", "q3", "q5_erklärung", "q6_erklärung", "q7_erklärung"]
+        textfelder = [col for col in ["q1", "q2", "q3", "q5_erklärung", "q6_erklärung", "q7_erklärung"] if col in data.columns]
         textauszüge = data[textfelder].fillna("").apply(lambda x: " ".join(x), axis=1)
         sentiment_scores = textauszüge.apply(lambda x: TextBlob(x).sentiment.polarity)
         st.write("Durchschnittliches Sentiment:", round(sentiment_scores.mean(), 2))
