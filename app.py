@@ -99,8 +99,8 @@ with st.expander("📊 Antworten anzeigen (Admin)"):
 
         # Themenanalyse (LDA)
         st.subheader("📚 Thematische Gruppierung (LDA)")
-        vectorizer = CountVectorizer(stop_words='english', max_df=0.95, min_df=2)
-        dtm = vectorizer.fit_transform(textauszüge)
+        vectorizer = CountVectorizer(stop_words='english', max_df=0.95, min_df=1)
+        dtm = vectorizer.fit_transform(textauszüge[textauszüge.str.strip() != ""])
         if dtm.shape[0] >= 2 and dtm.shape[1] >= 2:
             lda = LatentDirichletAllocation(n_components=3, random_state=0)
             lda.fit(dtm)
