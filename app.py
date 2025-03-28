@@ -1,6 +1,6 @@
-
 import streamlit as st
 import pandas as pd
+import os
 
 st.set_page_config(page_title="Studie zur emotionalen Offenheit", layout="centered")
 st.title("Online-Studie: Emotionale Ausdrucksfähigkeit und Diversität")
@@ -46,5 +46,19 @@ elif modus == "Kombiniert":
 st.markdown("---")
 if st.button("Antworten speichern"):
     df = pd.DataFrame([antworten])
-    df.to_csv("antworten.csv", mode='a', header=False, index=False)
+    if os.path.exists("antworten.csv"):
+        df.to_csv("antworten.csv", mode='a', header=False, index=False)
+    else:
+        df.to_csv("antworten.csv", index=False)
     st.success("Deine Antworten wurden gespeichert. Vielen Dank für deine Teilnahme!")
+
+# Bereich für Admin / Forscher: Daten anzeigen
+st.markdown("---")
+with st.expander("📊 Antworten anzeigen (Admin)"):
+    try:
+        data = pd.read_csv("antworten.csv")
+        st.dataframe(data)
+    except FileNotFoundError:
+        st.warning("Noch keine Antworten gespeichert oder Datei nicht gefunden.")
+    except Exception as e:
+        st.error(f"Fehler beim Laden der Daten: {e}")
